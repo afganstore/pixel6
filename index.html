@@ -4,24 +4,78 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Pixel Clicker</title>
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
+        <link rel="shortcut icon" href="/assets/images/favicon.png" />
+        <link rel="apple-touch-icon" href="/assets/images/favicon.png" />
+
+        <!-- OpenGraph Meta Tags -->
+        <meta property="og:title" content="Pixel Clicker" />
+        <meta property="og:description" content="у меня пиксель 6" />
+        <meta property="og:image" content="/assets/images/favicon.png" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://afagp.store/pixel6" />
+        <meta property="og:site_name" content="Pixel Clicker" />
+        <meta property="og:locale" content="ru_RU" />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Pixel Clicker" />
+        <meta name="twitter:description" content="у меня пиксель 6" />
+        <meta name="twitter:image" content="/assets/images/og-favicon.png" />
+
+        <meta name="description" content="у меня пиксель 6" />
+        <meta name="keywords" content="pixelclicker" />
+        <meta name="author" content="AFGAN Store" />
+
         <link rel="stylesheet" href="assets/css/main.css" />
+        <link rel="stylesheet" href="assets/css/anim.css" />
+        <link rel="stylesheet" href="assets/css/skins.css" />
+        <link rel="stylesheet" href="assets/css/settings.css" />
+        <link rel="stylesheet" href="assets/css/store.css" />
     </head>
     <body>
         <div class="container">
             <div class="header">
                 <div class="counter" id="counter">0</div>
-                <button class="settings-btn" id="settingsBtn">
-                    <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                    >
-                        <path
-                            d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.91,11.36,4.89,11.69,4.89,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"
-                        />
-                    </svg>
-                </button>
+                <div class="header-buttons">
+                    <button class="icon-btn" id="storeBtn">
+                        <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a1 1 0 0 0-1 1v11a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1zm-9-1a2 2 0 0 1 4 0v1h-4V6zm8 13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9h2v1a1 1 0 0 0 2 0V9h4v1a1 1 0 0 0 2 0V9h2v10z"
+                            />
+                        </svg>
+                    </button>
+                    <button class="icon-btn" id="skinsBtn">
+                        <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M12,2C13.1,2 14,2.9 14,4C14,5.1 13.1,6 12,6C10.9,6 10,5.1 10,4C10,2.9 10.9,2 12,2ZM21,9V7L15,5.5V7H9V5.5L3,7V9L15,11V13H9V11L3,13V15L9,13.5V15H15V13.5L21,15V13L15,11V9L21,11V9Z"
+                            />
+                        </svg>
+                    </button>
+                    <button class="icon-btn" id="settingsBtn">
+                        <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.91,11.36,4.89,11.69,4.89,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"
+                            />
+                        </svg>
+                    </button>
+                </div>
             </div>
             <div class="click-area">
                 <img
@@ -33,6 +87,37 @@
             </div>
         </div>
 
+        <!-- Popup магазина -->
+        <div class="store-popup" id="storePopup">
+            <div class="popup-content">
+                <div class="popup-header">
+                    <h2>Магазин скинов</h2>
+                    <button class="close-btn" id="closeStorePopup">×</button>
+                </div>
+                <div class="store-content">
+                    <!-- Убрана секция баланса -->
+                    <div class="store-grid" id="storeGrid">
+                        <!-- Скины будут добавляться через JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popup скинов -->
+        <div class="skins-popup" id="skinsPopup">
+            <div class="popup-content">
+                <div class="popup-header">
+                    <h2>Мои скины</h2>
+                    <button class="close-btn" id="closeSkinsPopup">×</button>
+                </div>
+                <div class="skins-content">
+                    <div class="skins-grid" id="skinsGrid">
+                        <!-- Скины будут добавляться через JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Popup настроек -->
         <div class="settings-popup" id="settingsPopup">
             <div class="popup-content">
@@ -40,62 +125,229 @@
                     <h2>Настройки</h2>
                     <button class="close-btn" id="closePopup">×</button>
                 </div>
-                <div class="settings-content">
-                    <div class="setting-group">
-                        <h3>Внешний вид</h3>
-                        <div class="setting-item">
-                            <label class="switch">
-                                <input type="checkbox" id="darkThemeToggle" />
-                                <span class="slider"></span>
-                            </label>
-                            <span class="setting-label">Тёмная тема</span>
-                        </div>
 
-                        <div class="setting-item">
-                            <label class="setting-label"
-                                >Изображение для клика:</label
-                            >
-                            <div class="image-selector">
-                                <div class="image-option" data-image="p6.png">
-                                    <img
-                                        src="assets/images/p6.png"
-                                        alt="Pixel 6"
+                <!-- Вкладки категорий -->
+                <div class="settings-tabs">
+                    <button class="tab-btn active" data-tab="all">Все</button>
+                    <button class="tab-btn" data-tab="appearance">
+                        🎨 Внешний вид
+                    </button>
+                    <button class="tab-btn" data-tab="audio">🔊 Звуки</button>
+                    <button class="tab-btn" data-tab="optimization">
+                        ⚡ Оптимизация
+                    </button>
+                    <button class="tab-btn" data-tab="actions">
+                        🛠️ Действия
+                    </button>
+                    <button class="tab-btn" data-tab="mods">⚡ Моды</button>
+                    <button class="tab-btn" data-tab="links">🔗 Ссылки</button>
+                </div>
+
+                <div class="settings-content">
+                    <!-- Категория: Внешний вид -->
+                    <div class="setting-category" data-category="appearance">
+                        <h3 class="category-title">🎨 Внешний вид</h3>
+                        <div class="setting-group">
+                            <div class="setting-item">
+                                <label class="switch">
+                                    <input
+                                        type="checkbox"
+                                        id="darkThemeToggle"
                                     />
-                                    <span>Pixel 6</span>
-                                </div>
-                                <div class="image-option" data-image="esha.jpg">
-                                    <img
-                                        src="assets/images/esha.jpg"
-                                        alt="Esha"
-                                    />
-                                    <span>Esha</span>
-                                </div>
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="setting-label">Тёмная тема</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="setting-group">
-                        <h3>Действия</h3>
-                        <button class="danger-btn" id="resetData">
-                            Сбросить всё
-                        </button>
+                    <!-- Категория: Звуки -->
+                    <div class="setting-category" data-category="audio">
+                        <h3 class="category-title">🔊 Звуки</h3>
+                        <div class="setting-group">
+                            <div class="setting-item">
+                                <label class="switch">
+                                    <input
+                                        type="checkbox"
+                                        id="soundToggle"
+                                        checked
+                                    />
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="setting-label">Звуки кликов</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="setting-group">
-                        <h3>Ссылки</h3>
-                        <a
-                            href="https://afagp.store"
-                            target="_blank"
-                            class="link-btn"
-                        >
-                            AFGAN Store
-                        </a>
+                    <!-- Категория: Оптимизация -->
+                    <div class="setting-category" data-category="optimization">
+                        <h3 class="category-title">⚡ Оптимизация</h3>
+                        <div class="setting-group">
+                            <div class="setting-item">
+                                <label class="switch">
+                                    <input
+                                        type="checkbox"
+                                        id="animationsToggle"
+                                        checked
+                                    />
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="setting-label">Анимации</span>
+                            </div>
+                            <div class="setting-item">
+                                <label class="switch">
+                                    <input
+                                        type="checkbox"
+                                        id="particlesToggle"
+                                        checked
+                                    />
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="setting-label"
+                                    >Эффекты частиц</span
+                                >
+                            </div>
+                            <div class="setting-item">
+                                <label class="switch">
+                                    <input
+                                        type="checkbox"
+                                        id="gradientToggle"
+                                        checked
+                                    />
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="setting-label"
+                                    >Анимированный градиент</span
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Категория: Действия -->
+                    <div class="setting-category" data-category="actions">
+                        <h3 class="category-title">🛠️ Действия</h3>
+                        <div class="setting-group">
+                            <button class="danger-btn" id="resetData">
+                                Сбросить весь прогресс
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Категория: Моды -->
+                    <div class="setting-category hidden" data-category="mods">
+                        <h3 class="category-title">⚡ Моды</h3>
+                        <div class="setting-group">
+                            <div class="mod-warning">
+                                <h4>⚠️ Внимание</h4>
+                                <p>
+                                    Выполнение пользовательского кода может
+                                    повлиять на работу приложения. Используйте
+                                    только доверенный код.
+                                </p>
+                            </div>
+
+                            <!-- Блок автозагрузки модов -->
+                            <div class="auto-load-container">
+                                <label class="switch">
+                                    <input
+                                        type="checkbox"
+                                        id="autoLoadToggle"
+                                    />
+                                    <span class="slider"></span>
+                                </label>
+                                <div class="auto-load-label">
+                                    Автозагрузка мода
+                                    <div class="auto-load-description">
+                                        Мод будет автоматически загружаться при
+                                        каждом входе в игру
+                                    </div>
+                                </div>
+                            </div>
+
+                            <textarea
+                                class="code-editor"
+                                id="customModCode"
+                                placeholder="// Введите ваш JavaScript код здесь..."
+                            ></textarea>
+
+                            <div class="mod-actions">
+                                <button class="mod-btn apply-mod" id="applyMod">
+                                    Применить мод
+                                </button>
+                                <button class="mod-btn clear-mod" id="clearMod">
+                                    Очистить
+                                </button>
+                            </div>
+
+                            <!-- Список автозагружаемых модов -->
+                            <div class="auto-load-list" id="autoLoadList">
+                                <!-- Список модов будет генерироваться автоматически -->
+                            </div>
+
+                            <div
+                                class="mod-status"
+                                id="modStatus"
+                                style="display: none"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <!-- Категория: Ссылки -->
+                    <div class="setting-category" data-category="links">
+                        <h3 class="category-title">🔗 Ссылки</h3>
+                        <div class="setting-group">
+                            <a
+                                href="https://afagp.store"
+                                target="_blank"
+                                class="link-btn"
+                            >
+                                🌟 AFGAN Store
+                            </a>
+                            <a
+                                href="https://t.me/pixelclicker_mods"
+                                target="_blank"
+                                class="link-btn"
+                            >
+                                📱 Мододельня
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Модальное окно подтверждения -->
+        <div class="confirmation-modal" id="modConfirmationModal">
+            <div class="confirmation-content">
+                <div class="confirmation-header">
+                    <div class="confirmation-icon">⚠️</div>
+                    <h3 class="confirmation-title">Подтверждение</h3>
+                </div>
+
+                <p class="confirmation-message">
+                    Вы уверены, что хотите выполнить этот код? Это может
+                    повлиять на работу приложения.
+                </p>
+
+                <div class="code-preview" id="codePreview">
+                    // код будет показан здесь...
+                </div>
+
+                <div class="confirmation-actions">
+                    <button class="confirm-btn confirm-no" id="confirmModNo">
+                        Отмена
+                    </button>
+                    <button class="confirm-btn confirm-yes" id="confirmModYes">
+                        Выполнить код
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <script src="assets/js/clicker.js"></script>
+        <script src="assets/js/skins.js"></script>
         <script src="assets/js/settings.js"></script>
+        <script src="assets/include/shop.js"></script>
+        <script src="assets/js/store.js"></script>
     </body>
 </html>

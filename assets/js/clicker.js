@@ -2,7 +2,6 @@ class PixelClicker {
   constructor() {
     this.counter = document.getElementById("counter");
     this.clickImage = document.getElementById("clickImage");
-    this.settingsBtn = document.getElementById("settingsBtn");
     this.soundPool = [];
     this.poolSize = 5;
 
@@ -11,7 +10,26 @@ class PixelClicker {
     this.initializeSoundPool();
     this.updateDisplay();
     this.startContinuousGradient();
-    this.loadImageSetting();
+
+    // Инициализируем коллекцию скинов если ее нет
+    this.initializeSkins();
+
+    // Сразу загружаем выбранный скин
+    this.loadSkinSetting();
+  }
+
+  initializeSkins() {
+    if (!localStorage.getItem("ownedSkins")) {
+      localStorage.setItem("ownedSkins", '["p6"]'); // Базовый скин
+    }
+    if (!localStorage.getItem("selectedSkin")) {
+      localStorage.setItem("selectedSkin", "p6"); // Выбранный скин
+    }
+
+    // Инициализация для модов
+    if (!localStorage.getItem("customModCode")) {
+      localStorage.setItem("customModCode", "");
+    }
   }
 
   initializeSoundPool() {
@@ -62,6 +80,11 @@ class PixelClicker {
     this.animateClick();
     this.saveCount();
     this.updateDisplay();
+
+    // Обновляем баланс в магазине если он открыт
+    if (window.storeManager) {
+      window.storeManager.updateBalance();
+    }
   }
 
   getRandomPositionAroundPixel(event) {
@@ -126,24 +149,94 @@ class PixelClicker {
     animateGradient();
   }
 
-  loadImageSetting() {
-    const savedImage = localStorage.getItem("clickImage") || "p6.png";
-    this.clickImage.src = `assets/images/${savedImage}`;
+  loadSkinSetting() {
+    const savedSkinId = localStorage.getItem("selectedSkin") || "p6";
+
+    // Сначала устанавливаем базовый скин
+    this.clickImage.src = `assets/images/p6.png`;
+
+    // Потом пытаемся загрузить выбранный скин
+    this.loadSelectedSkin(savedSkinId);
   }
 
-  changeImage(imageName) {
+  loadSelectedSkin(skinId) {
+    // Ждем загрузки storeItems
+    this.waitForStoreItems()
+      .then(() => {
+        if (typeof storeItems !== "undefined" && storeItems) {
+          const skin = storeItems.find((s) => s.id === skinId);
+          if (skin && skin.id !== "p6") {
+            // Не перезагружаем базовый скин
+            const img = new Image();
+            img.onload = () => {
+              this.clickImage.src = `assets/images/${skin.image}`;
+            };
+            img.onerror = () => {
+              console.warn(`Не удалось загрузить скин: ${skin.image}`);
+              this.clickImage.src = `assets/images/p6.png`;
+            };
+            img.src = `assets/images/${skin.image}`;
+          }
+        }
+      })
+      .catch(() => {
+        console.warn("storeItems не загрузился, используем базовый скин");
+      });
+  }
+
+  waitForStoreItems() {
+    return new Promise((resolve, reject) => {
+      let attempts = 0;
+      const maxAttempts = 50; // 5 секунд максимум
+
+      const checkStoreItems = () => {
+        attempts++;
+        if (typeof storeItems !== "undefined" && storeItems) {
+          resolve();
+        } else if (attempts >= maxAttempts) {
+          reject(new Error("storeItems не загрузился за отведенное время"));
+        } else {
+          setTimeout(checkStoreItems, 100);
+        }
+      };
+      checkStoreItems();
+    });
+  }
+
+  changeSkin(imageName) {
     this.clickImage.src = `assets/images/${imageName}`;
-    localStorage.setItem("clickImage", imageName);
   }
 
   resetData() {
     this.count = 0;
     this.saveCount();
     this.updateDisplay();
+    localStorage.setItem("ownedSkins", '["p6"]'); // Оставляем только базовый скин
+    localStorage.setItem("selectedSkin", "p6"); // Сбрасываем выбранный скин
+
+    // Обновляем интерфейсы
+    if (window.storeManager) {
+      window.storeManager.updateBalance();
+      window.storeManager.loadStoreItems();
+    }
+    if (window.skinsManager) {
+      window.skinsManager.loadAvailableSkins();
+      window.skinsManager.currentSkin = "p6";
+    }
+
+    // Перезагружаем текущий скин
+    this.loadSkinSetting();
   }
 
   getIncrementValue() {
     return 1;
+  }
+
+  forceUpdate() {
+    this.updateDisplay();
+    if (window.storeManager) {
+      window.storeManager.updateBalance();
+    }
   }
 
   formatNumber(number) {
@@ -185,7 +278,7 @@ class PixelClicker {
   }
 }
 
-// Глобальная переменная для доступа из settings.js
+// Глобальная переменная для доступа из других скриптов
 let clicker;
 
 // Инициализация при загрузке страницы

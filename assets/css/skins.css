@@ -1,0 +1,232 @@
+/* Popup скинов */
+.skins-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    z-index: 1000;
+    display: none;
+    opacity: 0;
+}
+
+.skins-popup.active {
+    display: flex;
+    opacity: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.skins-popup .popup-content {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.skins-popup .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--text-secondary);
+}
+
+.skins-popup .popup-header h2 {
+    color: var(--text-primary);
+    font-size: 1.8rem;
+}
+
+.skins-popup .close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.skins-popup .close-btn:hover {
+    background-color: var(--bg-secondary);
+    transform: rotate(90deg) scale(1.1);
+}
+
+/* Контент скинов */
+.skins-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.skins-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.skin-card {
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    padding: 1.5rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.skin-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    transition: left 0.5s;
+}
+
+.skin-card:hover::before {
+    left: 100%;
+}
+
+.skin-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    border-color: var(--accent-color);
+}
+
+.skin-card.active {
+    border-color: var(--accent-color);
+    background: var(--bg-secondary);
+}
+
+.skin-card.active::after {
+    content: "✓";
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--accent-color);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.skin-preview {
+    width: 100%;
+    height: 180px;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.skin-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.skin-card:hover .skin-preview img {
+    transform: scale(1.1);
+}
+
+.skin-preview::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        45deg,
+        transparent 0%,
+        rgba(103, 80, 164, 0.1) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.skin-card:hover .skin-preview::after {
+    opacity: 1;
+}
+
+.skin-info h3 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.skin-info p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+/* Анимация выбора скина */
+.skin-selected {
+    animation: pulse 0.6s ease-in-out;
+}
+
+/* Responsive для скинов */
+@media (max-width: 768px) {
+    .skins-popup .popup-content {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+
+    .skins-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .skin-preview {
+        height: 150px;
+    }
+
+    .skin-card {
+        padding: 1rem;
+    }
+
+    .skin-info h3 {
+        font-size: 1.1rem;
+    }
+
+    .skin-info p {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .skins-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .skin-preview {
+        height: 120px;
+    }
+}
