@@ -40,6 +40,113 @@ class SettingsManager {
     this.setupTabs();
     this.setupModsEventListeners();
     this.loadAutoLoadMods();
+
+    // Инициализация системы звуков
+    this.initializeSoundSystem();
+  }
+
+  initializeSoundSystem() {
+    // Создаем контейнер для выбора звуков если его нет
+    this.createSoundSelectionUI();
+  }
+
+  createSoundSelectionUI() {
+    // Находим категорию звуков
+    const audioCategory = document.querySelector('[data-category="audio"]');
+    if (!audioCategory) return;
+
+    // Проверяем, не добавлен ли уже блок выбора звуков
+    if (document.getElementById("soundSelection")) return;
+
+    const soundSelectionHTML = `
+      <div class="sound-selection" id="soundSelection">
+        <div class="sound-combobox">
+          <select class="sound-select" id="soundSelect">
+          </select>
+        </div>
+      </div>
+    `;
+
+    // Добавляем после переключателя звуков
+    const soundToggle = audioCategory.querySelector("#soundToggle");
+    if (soundToggle) {
+      soundToggle
+        .closest(".setting-item")
+        .insertAdjacentHTML("afterend", soundSelectionHTML);
+    }
+
+    // Загружаем список звуков
+    this.loadSoundOptions();
+  }
+
+  loadSoundOptions() {
+    const soundSelect = document.getElementById("soundSelect");
+    if (!soundSelect) return;
+
+    // Проверяем доступность clickSounds
+    if (typeof clickSounds === "undefined" || !clickSounds) {
+      soundSelect.innerHTML =
+        '<option value="">Ошибка загрузки звуков</option>';
+      return;
+    }
+
+    const currentSoundId = localStorage.getItem("clickSound") || "pixel6";
+    let html = "";
+
+    clickSounds.sounds.forEach((sound) => {
+      const isSelected = sound.id === currentSoundId;
+      html += `<option value="${sound.id}" ${isSelected ? "selected" : ""}>${sound.name}</option>`;
+    });
+
+    soundSelect.innerHTML = html;
+
+    // Добавляем обработчики событий
+    this.addSoundEventListeners();
+  }
+
+  addSoundEventListeners() {
+    const soundSelect = document.getElementById("soundSelect");
+    if (!soundSelect) return;
+
+    soundSelect.addEventListener("change", (e) => {
+      const soundId = e.target.value;
+      this.selectSound(soundId);
+    });
+  }
+
+  selectSound(soundId) {
+    if (!clicker) {
+      this.showNotification("Кликер не инициализирован", "error");
+      return;
+    }
+
+    const success = clicker.changeClickSound(soundId);
+
+    if (success) {
+      // Анимация выбора
+      const soundSelect = document.getElementById("soundSelect");
+      soundSelect.classList.add("sound-selected");
+      setTimeout(() => {
+        soundSelect.classList.remove("sound-selected");
+      }, 300);
+
+      this.showNotification(
+        `Звук изменен на: ${this.getSoundName(soundId)}`,
+        "success",
+      );
+    } else {
+      this.showNotification("Ошибка смены звука", "error");
+      // Сбрасываем выбор в комбобоксе
+      this.loadSoundOptions();
+    }
+  }
+
+  getSoundName(soundId) {
+    if (typeof clickSounds !== "undefined" && clickSounds) {
+      const sound = clickSounds.sounds.find((s) => s.id === soundId);
+      return sound ? sound.name : soundId;
+    }
+    return soundId;
   }
 
   setupEventListeners() {
@@ -123,6 +230,7 @@ class SettingsManager {
       setTimeout(() => {
         this.loadSavedMod();
         this.updateAutoLoadList();
+        this.loadSoundOptions(); // Обновляем список звуков при открытии настроек
       }, 100);
     });
   }
@@ -266,6 +374,11 @@ class SettingsManager {
       setTimeout(() => {
         this.resetDataBtn.classList.remove("animate-shake");
       }, 500);
+
+      // Обновляем интерфейс звуков
+      setTimeout(() => {
+        this.loadSoundOptions();
+      }, 100);
     }
   }
 
@@ -689,6 +802,41 @@ class SettingsManager {
     console.log("🗑️ Все автозагружаемые моды очищены");
 
     this.updateAutoLoadList();
+  }
+
+  showNotification(message, type = "info") {
+    // Создаем уведомление если его нет в DOM
+    let notification = document.querySelector(".sound-notification");
+    if (!notification) {
+      notification = document.createElement("div");
+      notification.className = `sound-notification ${type}`;
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === "success" ? "#4CAF50" : type === "error" ? "#F44336" : "#2196F3"};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        z-index: 1001;
+        animation: slideInRight 0.3s ease-out;
+      `;
+      document.body.appendChild(notification);
+    }
+
+    notification.textContent = message;
+    notification.className = `sound-notification ${type}`;
+
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.style.animation = "slideOutRight 0.3s ease-out forwards";
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      }
+    }, 3000);
   }
 }
 

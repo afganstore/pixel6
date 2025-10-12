@@ -78,12 +78,27 @@ class StoreManager {
     }
 
     storeItems.forEach((item) => {
-      const isOwned = this.isSkinOwned(item.id);
-      const canAfford = this.canAfford(item.price);
+      if (item.type === "skin") {
+        this.createSkinItem(item);
+      } else if (item.type === "upgrade") {
+        this.createUpgradeItem(item);
+      }
+    });
 
-      const storeItem = document.createElement("div");
-      storeItem.className = `store-item ${isOwned ? "owned" : ""}`;
-      storeItem.innerHTML = `
+    // Обновляем информацию о прокачке
+    this.updateUpgradeInfo();
+
+    // Добавляем обработчики для кнопок покупки
+    this.addBuyButtonListeners();
+  }
+
+  createSkinItem(item) {
+    const isOwned = this.isSkinOwned(item.id);
+    const canAfford = this.canAfford(item.price);
+
+    const storeItem = document.createElement("div");
+    storeItem.className = `store-item ${isOwned ? "owned" : ""}`;
+    storeItem.innerHTML = `
                 <div class="store-item-preview">
                     <img src="assets/images/${item.image}" alt="${item.name}" onerror="this.src='assets/images/p6.png'">
                 </div>
@@ -95,6 +110,7 @@ class StoreManager {
                     </div>
                     <button class="buy-btn ${isOwned ? "owned" : ""}"
                             data-id="${item.id}"
+                            data-type="skin"
                             data-price="${item.price}"
                             ${isOwned ? "disabled" : !canAfford ? "disabled" : ""}>
                         ${isOwned ? "Куплен" : !canAfford ? "Недостаточно" : "Купить"}
@@ -103,23 +119,140 @@ class StoreManager {
                 </div>
             `;
 
-      this.storeGrid.appendChild(storeItem);
+    this.storeGrid.appendChild(storeItem);
+  }
+
+  createUpgradeItem(item) {
+    const currentLevel = this.getUpgradeLevel(item.id);
+    const nextLevel = currentLevel + 1;
+    const currentPrice = this.calculateUpgradePrice(item.id, nextLevel);
+    const canAfford = this.canAfford(currentPrice);
+    const isMaxLevel = currentLevel >= item.maxLevel;
+
+    // Рассчитываем текущий и максимальный бонус
+    const currentBonus = currentLevel * item.multiplier;
+    const maxBonus = item.maxLevel * item.multiplier;
+
+    const storeItem = document.createElement("div");
+    storeItem.className = `store-item upgrade-item ${isMaxLevel ? "max-level" : ""}`;
+    storeItem.innerHTML = `
+                <div class="store-item-preview">
+                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--accent-color); border-radius: 12px; color: white; font-size: 24px; font-weight: bold;">
+                        +${item.multiplier}
+                    </div>
+                </div>
+                <div class="store-item-info">
+                    <h3>${item.name} (Ур. ${currentLevel})</h3>
+                    <p>${item.description}</p>
+                    <div class="upgrade-stats">
+                        <div style="font-size: 0.9rem; margin: 0.5rem 0;">
+                            <span style="color: var(--success-color)">Текущий бонус: +${currentBonus}</span><br>
+                            <span style="color: #ff4444">Максимум: +${maxBonus} за клик</span>
+                        </div>
+                    </div>
+                    <div class="upgrade-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${(currentLevel / item.maxLevel) * 100}%"></div>
+                        </div>
+                        <span class="progress-text">${currentLevel} / ${item.maxLevel}</span>
+                    </div>
+                    <div class="store-item-price">
+                        <span class="price">${isMaxLevel ? "МАКС." : currentPrice}</span>
+                    </div>
+                    <button class="buy-btn upgrade-btn ${isMaxLevel ? "max-level" : ""}"
+                            data-id="${item.id}"
+                            data-type="upgrade"
+                            data-price="${currentPrice}"
+                            ${isMaxLevel ? "disabled" : !canAfford ? "disabled" : ""}>
+                        ${isMaxLevel ? "Макс. уровень" : !canAfford ? "Недостаточно" : "Улучшить"}
+                    </button>
+                    ${!isMaxLevel && !canAfford ? '<div class="insufficient-funds">Не хватает: ' + (currentPrice - this.getBalance()) + "</div>" : ""}
+                </div>
+            `;
+
+    this.storeGrid.appendChild(storeItem);
+  }
+
+  calculateUpgradePrice(upgradeId, level) {
+    const baseItem = storeItems.find((item) => item.id === upgradeId);
+    if (!baseItem) return 0;
+
+    // Базовая цена + 100 за каждый уровень
+    return baseItem.price + (level - 1) * 100;
+  }
+
+  getUpgradeLevel(upgradeId) {
+    return parseInt(localStorage.getItem(`upgrade_${upgradeId}_level`) || "0");
+  }
+
+  setUpgradeLevel(upgradeId, level) {
+    localStorage.setItem(`upgrade_${upgradeId}_level`, level.toString());
+  }
+
+  getTotalMultiplier() {
+    let totalMultiplier = 1;
+
+    if (typeof storeItems === "undefined" || !storeItems)
+      return totalMultiplier;
+
+    storeItems.forEach((item) => {
+      if (item.type === "upgrade") {
+        const level = this.getUpgradeLevel(item.id);
+        totalMultiplier += level * item.multiplier;
+      }
     });
 
-    // Добавляем обработчики для кнопок покупки
-    this.addBuyButtonListeners();
+    return totalMultiplier;
+  }
+
+  updateUpgradeInfo() {
+    // Обновляем информацию о множителе в описаниях прокачки
+    const multiplierElements = document.querySelectorAll("#currentMultiplier");
+    const totalMultiplier = this.getTotalMultiplier();
+
+    multiplierElements.forEach((element) => {
+      element.textContent = totalMultiplier;
+    });
+
+    // Обновляем прогресс бары
+    const progressBars = document.querySelectorAll(".progress-fill");
+    progressBars.forEach((bar) => {
+      const storeItem = bar.closest(".store-item");
+      if (storeItem) {
+        const upgradeId = storeItem.querySelector(".buy-btn")?.dataset.id;
+        if (upgradeId) {
+          const baseItem = storeItems.find((item) => item.id === upgradeId);
+          if (baseItem) {
+            const currentLevel = this.getUpgradeLevel(upgradeId);
+            bar.style.width = `${(currentLevel / baseItem.maxLevel) * 100}%`;
+
+            // Обновляем текст прогресса
+            const progressText = storeItem.querySelector(".progress-text");
+            if (progressText) {
+              progressText.textContent = `${currentLevel} / ${baseItem.maxLevel}`;
+            }
+          }
+        }
+      }
+    });
   }
 
   addBuyButtonListeners() {
     const buyButtons = this.storeGrid.querySelectorAll(
-      ".buy-btn:not(:disabled):not(.owned)",
+      ".buy-btn:not(:disabled):not(.owned):not(.max-level)",
     );
 
     buyButtons.forEach((button) => {
       button.addEventListener("click", (e) => {
-        const skinId = e.target.dataset.id;
+        const itemId = e.target.dataset.id;
+        const itemType = e.target.dataset.type;
         const price = parseInt(e.target.dataset.price);
-        this.buySkin(skinId, price);
+
+        if (itemType === "skin") {
+          this.buySkin(itemId, price);
+        } else if (itemType === "upgrade") {
+          this.buyUpgrade(itemId, price);
+        }
       });
     });
   }
@@ -151,6 +284,47 @@ class StoreManager {
     // Обновляем список скинов
     if (window.skinsManager) {
       window.skinsManager.loadAvailableSkins();
+    }
+  }
+
+  buyUpgrade(upgradeId, price) {
+    if (!this.canAfford(price)) {
+      this.showNotification("Недостаточно!", "error");
+      return;
+    }
+
+    const baseItem = storeItems.find((item) => item.id === upgradeId);
+    if (!baseItem) return;
+
+    const currentLevel = this.getUpgradeLevel(upgradeId);
+    const nextLevel = currentLevel + 1;
+
+    if (nextLevel > baseItem.maxLevel) {
+      this.showNotification("Достигнут максимальный уровень!", "error");
+      return;
+    }
+
+    // Списываем стоимость
+    this.deductBalance(price);
+
+    // Увеличиваем уровень прокачки
+    this.setUpgradeLevel(upgradeId, nextLevel);
+
+    // Обновляем интерфейс
+    this.updateBalance();
+    this.loadStoreItems();
+
+    // Показываем уведомление
+    const newBonus = nextLevel * baseItem.multiplier;
+    const totalMultiplier = this.getTotalMultiplier();
+    this.showNotification(
+      `Прокачка улучшена до уровня ${nextLevel}! Бонус: +${newBonus} (Всего: +${totalMultiplier - 1})`,
+      "success",
+    );
+
+    // Обновляем кликер
+    if (clicker) {
+      clicker.forceUpdate();
     }
   }
 
@@ -226,8 +400,7 @@ class StoreManager {
       if (typeof storeItems === "undefined" || !storeItems) return;
 
       storeItems.forEach((item) => {
-        if (item.id !== "p6") {
-          // Базовый скин уже загружен
+        if (item.id !== "p6" && item.type === "skin") {
           const img = new Image();
           img.src = `assets/images/${item.image}`;
         }

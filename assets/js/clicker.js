@@ -4,6 +4,7 @@ class PixelClicker {
     this.clickImage = document.getElementById("clickImage");
     this.soundPool = [];
     this.poolSize = 5;
+    this.currentSound = this.getCurrentSound();
 
     this.loadCount();
     this.setupEventListeners();
@@ -18,6 +19,66 @@ class PixelClicker {
     this.loadSkinSetting();
   }
 
+  getCurrentSound() {
+    const savedSoundId = localStorage.getItem("clickSound") || "pixel6";
+
+    // Проверяем существует ли выбранный звук
+    if (typeof clickSounds !== "undefined" && clickSounds) {
+      const sound = clickSounds.sounds.find((s) => s.id === savedSoundId);
+      if (sound) {
+        return sound;
+      }
+    }
+
+    // Возвращаем звук по умолчанию
+    return clickSounds.default;
+  }
+
+  initializeSoundPool() {
+    for (let i = 0; i < this.poolSize; i++) {
+      const audio = new Audio(`assets/sounds/${this.currentSound.file}`);
+      audio.volume = 0.7;
+      audio.preload = "auto";
+      this.soundPool.push(audio);
+    }
+  }
+
+  updateSoundPool() {
+    // Останавливаем все текущие звуки
+    this.soundPool.forEach((audio) => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
+
+    // Пересоздаем пул с новым звуком
+    this.soundPool = [];
+    for (let i = 0; i < this.poolSize; i++) {
+      const audio = new Audio(`assets/sounds/${this.currentSound.file}`);
+      audio.volume = 0.7;
+      audio.preload = "auto";
+      this.soundPool.push(audio);
+    }
+  }
+
+  changeClickSound(soundId) {
+    if (typeof clickSounds === "undefined" || !clickSounds) {
+      console.warn("clickSounds not available");
+      return false;
+    }
+
+    const newSound = clickSounds.sounds.find((s) => s.id === soundId);
+    if (!newSound) {
+      console.warn(`Sound not found: ${soundId}`);
+      return false;
+    }
+
+    this.currentSound = newSound;
+    localStorage.setItem("clickSound", soundId);
+    this.updateSoundPool();
+
+    return true;
+  }
+
   initializeSkins() {
     if (!localStorage.getItem("ownedSkins")) {
       localStorage.setItem("ownedSkins", '["p6"]'); // Базовый скин
@@ -29,14 +90,6 @@ class PixelClicker {
     // Инициализация для модов
     if (!localStorage.getItem("customModCode")) {
       localStorage.setItem("customModCode", "");
-    }
-  }
-
-  initializeSoundPool() {
-    for (let i = 0; i < this.poolSize; i++) {
-      const audio = new Audio("assets/sounds/pixel6.mp3");
-      audio.volume = 0.7;
-      this.soundPool.push(audio);
     }
   }
 
@@ -73,10 +126,23 @@ class PixelClicker {
     );
   }
 
+  getIncrementValue() {
+    const baseIncrement = 1;
+    let multiplier = 1;
+
+    // Получаем множитель из системы прокачки
+    if (window.storeManager) {
+      multiplier = window.storeManager.getTotalMultiplier();
+    }
+
+    return baseIncrement * multiplier;
+  }
+
   handleClick(event) {
-    this.count++;
+    const increment = this.getIncrementValue();
+    this.count += increment;
     this.playClickSound();
-    this.showClickOverlay(event);
+    this.showClickOverlay(event, increment);
     this.animateClick();
     this.saveCount();
     this.updateDisplay();
@@ -101,10 +167,10 @@ class PixelClicker {
     return { x, y };
   }
 
-  showClickOverlay(event) {
+  showClickOverlay(event, increment) {
     const overlay = document.createElement("div");
     overlay.className = "click-overlay";
-    overlay.textContent = `+${this.getIncrementValue()}`;
+    overlay.textContent = `+${increment}`;
 
     const position = this.getRandomPositionAroundPixel(event);
     overlay.style.left = `${position.x}px`;
@@ -112,6 +178,37 @@ class PixelClicker {
 
     const rotation = -15 + Math.random() * 30;
     overlay.style.transform = `rotate(${rotation}deg)`;
+
+    // Разный цвет в зависимости от величины инкремента
+    if (increment >= 1000) {
+      overlay.style.color = "#ff4444";
+      overlay.style.fontSize = "3.5rem";
+      overlay.style.fontWeight = "900";
+      overlay.style.textShadow =
+        "0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 20px rgba(255, 68, 68, 0.8), 0 8px 40px rgba(255, 68, 68, 0.6)";
+    } else if (increment >= 500) {
+      overlay.style.color = "#ff6b35";
+      overlay.style.fontSize = "3rem";
+      overlay.style.fontWeight = "700";
+      overlay.style.textShadow =
+        "0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 20px rgba(255, 107, 53, 0.8)";
+    } else if (increment >= 100) {
+      overlay.style.color = "#ffaa00";
+      overlay.style.fontSize = "2.8rem";
+      overlay.style.fontWeight = "600";
+      overlay.style.textShadow =
+        "0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 20px rgba(255, 170, 0, 0.8)";
+    } else if (increment >= 50) {
+      overlay.style.color = "#ffd700";
+      overlay.style.fontSize = "2.5rem";
+      overlay.style.textShadow =
+        "0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 20px rgba(255, 215, 0, 0.8)";
+    } else if (increment >= 10) {
+      overlay.style.color = "#a0e7a0";
+      overlay.style.fontSize = "2.2rem";
+      overlay.style.textShadow =
+        "0 2px 4px rgba(0, 0, 0, 0.8), 0 4px 20px rgba(160, 231, 160, 0.8)";
+    }
 
     document.body.appendChild(overlay);
 
@@ -213,6 +310,16 @@ class PixelClicker {
     this.updateDisplay();
     localStorage.setItem("ownedSkins", '["p6"]'); // Оставляем только базовый скин
     localStorage.setItem("selectedSkin", "p6"); // Сбрасываем выбранный скин
+    localStorage.setItem("clickSound", "pixel6"); // Сбрасываем звук
+
+    // Сбрасываем прокачку
+    if (typeof storeItems !== "undefined" && storeItems) {
+      storeItems.forEach((item) => {
+        if (item.type === "upgrade") {
+          localStorage.removeItem(`upgrade_${item.id}_level`);
+        }
+      });
+    }
 
     // Обновляем интерфейсы
     if (window.storeManager) {
@@ -224,12 +331,10 @@ class PixelClicker {
       window.skinsManager.currentSkin = "p6";
     }
 
-    // Перезагружаем текущий скин
+    // Перезагружаем текущий скин и звук
     this.loadSkinSetting();
-  }
-
-  getIncrementValue() {
-    return 1;
+    this.currentSound = this.getCurrentSound();
+    this.updateSoundPool();
   }
 
   forceUpdate() {
