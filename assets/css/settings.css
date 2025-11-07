@@ -22,27 +22,34 @@
 .settings-popup .popup-content {
     background: var(--card-bg);
     border-radius: 24px;
-    padding: 2rem;
+    padding: 0;
     width: 90%;
     max-width: 500px;
     max-height: 90vh;
-    overflow-y: auto;
+    overflow: hidden;
     box-shadow: var(--shadow);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
 }
 
 .settings-popup .popup-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--text-secondary);
+    padding: 1.5rem 2rem 1rem 2rem;
+    background: var(--card-bg);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    flex-shrink: 0;
+    /* Убрали border-bottom */
 }
 
 .settings-popup .popup-header h2 {
     color: var(--text-primary);
     font-size: 1.8rem;
+    margin: 0;
 }
 
 .settings-popup .close-btn {
@@ -65,12 +72,16 @@
 .settings-tabs {
     display: flex;
     gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--text-secondary);
+    padding: 0 2rem 1rem 2rem;
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    background: var(--card-bg);
+    position: sticky;
+    top: calc(1.8rem + 3rem); /* Высота заголовка + padding */
+    z-index: 19;
+    flex-shrink: 0;
+    /* Убрали border-bottom */
 }
 
 .settings-tabs::-webkit-scrollbar {
@@ -89,6 +100,7 @@
     transition: all 0.3s ease;
     white-space: nowrap;
     flex-shrink: 0;
+    position: relative;
 }
 
 .tab-btn:hover {
@@ -103,11 +115,16 @@
     box-shadow: 0 4px 12px rgba(103, 80, 164, 0.3);
 }
 
+/* УБРАН КОМПАКТНЫЙ РЕЖИМ ДЛЯ ВКЛАДОК */
+
 /* Контент настроек с категориями */
 .settings-content {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    padding: 0 2rem 2rem 2rem;
+    overflow-y: auto;
+    flex-grow: 1;
 }
 
 .setting-category {
@@ -313,8 +330,21 @@ input:checked + .slider:before {
 /* Responsive для настроек */
 @media (max-width: 768px) {
     .settings-popup .popup-content {
-        padding: 1.5rem;
         margin: 1rem;
+        width: calc(100% - 2rem);
+    }
+
+    .settings-popup .popup-header {
+        padding: 1rem 1.5rem 0.75rem 1.5rem;
+    }
+
+    .settings-tabs {
+        padding: 0 1.5rem 0.75rem 1.5rem;
+        top: calc(1.8rem + 2.5rem);
+    }
+
+    .settings-content {
+        padding: 0 1.5rem 1.5rem 1.5rem;
     }
 
     .settings-tabs {
@@ -365,6 +395,19 @@ input:checked + .slider:before {
         flex: 1;
         min-width: 80px;
         text-align: center;
+    }
+
+    .settings-popup .popup-header {
+        padding: 0.75rem 1rem 0.5rem 1rem;
+    }
+
+    .settings-tabs {
+        padding: 0 1rem 0.5rem 1rem;
+        top: calc(1.8rem + 2rem);
+    }
+
+    .settings-content {
+        padding: 0 1rem 1rem 1rem;
     }
 }
 
@@ -937,4 +980,775 @@ input:checked + .slider:before {
         padding: 0.875rem;
         font-size: 0.95rem;
     }
+}
+
+/* Фиксированный заголовок и вкладки для настроек */
+.settings-popup .popup-header-fixed {
+    position: sticky;
+    top: 0;
+    background: var(--card-bg);
+    z-index: 100;
+    /* Убрали border-bottom */
+}
+
+.settings-tabs-fixed {
+    position: sticky;
+    top: 80px; /* Высота заголовка */
+    background: var(--card-bg);
+    z-index: 99;
+    /* Убрали border-bottom */
+}
+
+/* Стили для выбора фона */
+.background-selection {
+    margin-top: 1rem;
+}
+
+.background-type-selector {
+    margin-bottom: 1rem;
+}
+
+.background-combobox {
+    position: relative;
+    width: 100%;
+}
+
+.background-select {
+    width: 100%;
+    padding: 1rem;
+    background: var(--card-bg);
+    border: 2px solid var(--text-secondary);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 16px;
+}
+
+.background-select:hover {
+    border-color: var(--accent-color);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.background-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(103, 80, 164, 0.2);
+}
+
+.background-select option {
+    background: var(--card-bg);
+    color: var(--text-primary);
+    padding: 0.5rem;
+}
+
+.color-picker-container {
+    margin-top: 1rem;
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.custom-gradient-container {
+    margin-top: 1rem;
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.gradient-colors-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.gradient-color-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--card-bg);
+    border-radius: 8px;
+    border: 1px solid var(--text-secondary);
+}
+
+.gradient-color-preview {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 2px solid var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.gradient-color-preview:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.gradient-color-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.gradient-color-label {
+    flex: 1;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.color-picker-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.color-picker-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.color-picker-input {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--card-bg);
+    border: 2px solid var(--text-secondary);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.color-picker-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(103, 80, 164, 0.2);
+}
+
+.color-preview {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    border: 2px solid var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.color-preview:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.color-preview-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.gradient-preview {
+    width: 100%;
+    height: 60px;
+    border-radius: 12px;
+    border: 2px solid var(--text-secondary);
+    margin-top: 0.75rem;
+    background: linear-gradient(45deg, #6750a4, #b583da, #e67bd6, #ff8da1);
+    transition: all 0.3s ease;
+}
+
+/* Стили для настоящих color pickers */
+.color-picker-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 2000;
+    animation: colorPickerOpen 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+.color-picker-dialog h3 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.color-picker-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    justify-content: flex-end;
+}
+
+.color-picker-confirm {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.color-picker-confirm:hover {
+    background: var(--accent-color);
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.color-picker-cancel {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--text-secondary);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.color-picker-cancel:hover {
+    background: var(--bg-primary);
+    transform: translateY(-1px);
+}
+
+/* Анимация переключения типа фона */
+@keyframes backgroundTypeSwitch {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.background-type-switch {
+    animation: backgroundTypeSwitch 0.3s ease-out;
+}
+
+/* Responsive для выбора фона */
+@media (max-width: 768px) {
+    .background-select {
+        padding: 0.875rem;
+        font-size: 0.95rem;
+    }
+
+    .color-picker-input {
+        padding: 0.625rem;
+        font-size: 0.95rem;
+    }
+
+    .color-preview {
+        width: 45px;
+        height: 45px;
+    }
+
+    .gradient-colors-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .gradient-color-item {
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+
+    .gradient-color-preview {
+        width: 35px;
+        height: 35px;
+    }
+
+    .gradient-preview {
+        height: 50px;
+    }
+
+    .gradient-color-label {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .gradient-color-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        text-align: center;
+    }
+
+    .gradient-color-preview {
+        align-self: center;
+    }
+
+    .color-picker-dialog {
+        padding: 1rem;
+        margin: 1rem;
+    }
+}
+
+/* Overlay для color picker */
+.color-picker-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 1999;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Анимации для color picker */
+@keyframes colorPickerOpen {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes colorPickerClose {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+}
+
+.color-picker-closing {
+    animation: colorPickerClose 0.3s ease-out forwards !important;
+}
+
+/* Стили для выбора акцентного цвета */
+.accent-color-selection {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--card-bg);
+    border-radius: 12px;
+    border-left: 4px solid var(--accent-color);
+}
+
+.accent-color-label {
+    display: block;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.accent-color-description {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.accent-color-preview-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.accent-color-preview {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    border: 3px solid var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.accent-color-preview:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.accent-color-preview-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.accent-color-info {
+    flex: 1;
+}
+
+.accent-color-hex {
+    font-family: "Courier New", monospace;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.accent-color-name {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.accent-color-presets {
+    margin-top: 1rem;
+}
+
+.accent-presets-title {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+}
+
+.accent-presets-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+}
+
+.accent-preset {
+    width: 100%;
+    height: 40px;
+    border-radius: 8px;
+    border: 2px solid var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.accent-preset:hover {
+    transform: scale(1.05);
+    border-color: var(--accent-color);
+}
+
+.accent-preset.active {
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 2px var(--accent-color);
+    transform: scale(1.05);
+}
+
+.accent-preset::after {
+    content: "✓";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.accent-preset.active::after {
+    opacity: 1;
+}
+
+/* Анимация смены акцентного цвета */
+@keyframes accentColorChange {
+    0% {
+        box-shadow: 0 0 0 0 var(--accent-color);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(103, 80, 164, 0.3);
+    }
+    100% {
+        box-shadow: 0 0 0 0 var(--accent-color);
+    }
+}
+
+.accent-color-change {
+    animation: accentColorChange 0.6s ease-out;
+}
+
+/* Responsive для акцентного цвета */
+@media (max-width: 768px) {
+    .accent-presets-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .accent-color-preview {
+        width: 50px;
+        height: 50px;
+    }
+
+    .accent-color-hex {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .accent-presets-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .accent-color-preview-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .accent-color-info {
+        width: 100%;
+    }
+}
+
+/* Добавьте эти стили в конец файла settings.css */
+
+/* Overlay для color picker */
+.color-picker-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 1999;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Стили для настоящих color pickers */
+.color-picker-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 2000;
+    animation: colorPickerOpen 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+.color-picker-dialog h3 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.color-picker-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    justify-content: flex-end;
+}
+
+.color-picker-confirm {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.color-picker-confirm:hover {
+    background: var(--accent-color);
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.color-picker-cancel {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--text-secondary);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.color-picker-cancel:hover {
+    background: var(--bg-primary);
+    transform: translateY(-1px);
+}
+
+/* Анимации для color picker */
+@keyframes colorPickerOpen {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes colorPickerClose {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+}
+
+.color-picker-closing {
+    animation: colorPickerClose 0.3s ease-out forwards !important;
+}
+
+/* Анимация ripple эффекта для кликов по цветам */
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+.color-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+}
+
+/* Анимация плавного изменения цвета */
+@keyframes smoothColorChange {
+    0% {
+        filter: hue-rotate(0deg) saturate(1);
+    }
+    100% {
+        filter: hue-rotate(360deg) saturate(1.2);
+    }
+}
+
+.smooth-color-transition {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Анимация для индикатора выбора цвета */
+@keyframes colorIndicator {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2) rotate(180deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(360deg);
+        opacity: 1;
+    }
+}
+
+.color-indicator {
+    animation: colorIndicator 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Анимация выбора цвета */
+@keyframes colorSelect {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(103, 80, 164, 0.4);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 10px rgba(103, 80, 164, 0.2);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(103, 80, 164, 0);
+    }
+}
+
+.color-select-animation {
+    animation: colorSelect 0.6s ease-out;
+}
+
+/* Анимация hover для цветных элементов */
+@keyframes colorHover {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.color-hover {
+    animation: colorHover 0.3s ease-out;
 }

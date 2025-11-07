@@ -14,6 +14,7 @@ class SettingsManager {
 
     this.tabButtons = document.querySelectorAll(".tab-btn");
     this.settingCategories = document.querySelectorAll(".setting-category");
+    this.settingsTabs = document.querySelector(".settings-tabs");
 
     this.customModCode = document.getElementById("customModCode");
     this.applyModBtn = document.getElementById("applyMod");
@@ -25,6 +26,48 @@ class SettingsManager {
     this.confirmModYes = document.getElementById("confirmModYes");
     this.confirmModNo = document.getElementById("confirmModNo");
     this.codePreview = document.getElementById("codePreview");
+
+    // Новые элементы для настройки фона
+    this.backgroundTypeSelect = document.getElementById("backgroundTypeSelect");
+    this.solidColorInput = document.getElementById("solidColorInput");
+    this.colorPreview = document.getElementById("colorPreview");
+    this.gradientColorInputs = [
+      document.getElementById("gradientColor1"),
+      document.getElementById("gradientColor2"),
+      document.getElementById("gradientColor3"),
+      document.getElementById("gradientColor4"),
+    ];
+    this.gradientColorPreviews = [
+      document.getElementById("gradientColorPreview1"),
+      document.getElementById("gradientColorPreview2"),
+      document.getElementById("gradientColorPreview3"),
+      document.getElementById("gradientColorPreview4"),
+    ];
+    this.gradientPreview = document.getElementById("gradientPreview");
+
+    // Элементы для акцентного цвета
+    this.accentColorPreview = document.getElementById("accentColorPreview");
+    this.accentColorHex = document.getElementById("accentColorHex");
+    this.accentColorName = document.getElementById("accentColorName");
+    this.accentPresetsContainer = document.getElementById("accentPresets");
+
+    // Переменные для color picker
+    this.colorPickerOverlay = null;
+    this.currentColorPicker = null;
+    this.pendingColorChange = null;
+    this.currentEscHandler = null;
+
+    // Пресеты акцентных цветов
+    this.accentColorPresets = [
+      { name: "Фиолетовый", value: "#6750a4", default: true },
+      { name: "Синий", value: "#2196f3" },
+      { name: "Зеленый", value: "#4caf50" },
+      { name: "Оранжевый", value: "#ff9800" },
+      { name: "Розовый", value: "#e91e63" },
+      { name: "Бирюзовый", value: "#00bcd4" },
+      { name: "Красный", value: "#f44336" },
+      { name: "Золотой", value: "#ffd700" },
+    ];
 
     this.isClosing = false;
     this.currentTab = "all";
@@ -43,6 +86,352 @@ class SettingsManager {
 
     // Инициализация системы звуков
     this.initializeSoundSystem();
+
+    // Инициализация настроек фона
+    this.setupBackgroundSettings();
+    this.loadBackgroundSettings();
+
+    // Инициализация акцентного цвета
+    this.setupAccentColor();
+    this.loadAccentColor();
+
+    // Обновляем структуру кнопок вкладок
+    this.updateTabButtonsStructure();
+  }
+
+  // МЕТОД: Обновление структуры кнопок вкладок для разделения эмодзи и текста
+  updateTabButtonsStructure() {
+    this.tabButtons.forEach((button) => {
+      const originalHTML = button.innerHTML;
+
+      // Сохраняем оригинальный HTML в data-атрибут
+      button.dataset.originalHTML = originalHTML;
+
+      // Извлекаем эмодзи (первый символ или символы до пробела)
+      const emojiMatch = originalHTML.match(/^.[^a-zA-Z0-9\s]*/);
+      const textMatch = originalHTML.replace(/^.[^a-zA-Z0-9\s]*\s*/, "");
+
+      if (emojiMatch) {
+        const emoji = emojiMatch[0];
+        const newHTML = `
+                    <span class="tab-emoji">${emoji}</span>
+                    <span class="tab-text">${textMatch}</span>
+                `;
+        button.innerHTML = newHTML;
+      }
+    });
+  }
+
+  // ОСТАЛЬНЫЕ МЕТОДЫ ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ
+  setupAccentColor() {
+    if (!this.accentColorPreview) return;
+
+    // Обработчик клика на превью акцентного цвета
+    this.accentColorPreview.addEventListener("click", () => {
+      this.openColorPicker("accent", this.getCurrentAccentColor());
+    });
+
+    // Создаем пресеты цветов
+    this.createAccentPresets();
+  }
+
+  createAccentPresets() {
+    if (!this.accentPresetsContainer) return;
+
+    this.accentColorPresets.forEach((preset, index) => {
+      const presetElement = document.createElement("div");
+      presetElement.className = `accent-preset preset-delay-${(index % 8) + 1} preset-stagger`;
+      presetElement.style.background = preset.value;
+      presetElement.title = preset.name;
+      presetElement.dataset.color = preset.value;
+      presetElement.dataset.name = preset.name;
+
+      presetElement.addEventListener("click", () => {
+        this.selectAccentPreset(presetElement, preset);
+      });
+
+      this.accentPresetsContainer.appendChild(presetElement);
+    });
+  }
+
+  selectAccentPreset(presetElement, preset) {
+    // Анимация выбора
+    presetElement.classList.add("color-select-animation");
+
+    // Убираем активный класс у всех пресетов
+    document.querySelectorAll(".accent-preset").forEach((p) => {
+      p.classList.remove("active", "preset-pulse");
+    });
+
+    // Добавляем активный класс к выбранному пресету
+    presetElement.classList.add("active", "preset-pulse");
+
+    // Применяем цвет
+    this.applyAccentColor(preset.value, preset.name);
+
+    // Показываем анимацию смены цвета
+    this.showAccentColorChangeAnimation();
+
+    setTimeout(() => {
+      presetElement.classList.remove("color-select-animation");
+    }, 600);
+  }
+
+  applyAccentColor(color, name = "Пользовательский") {
+    // Сохраняем в localStorage
+    localStorage.setItem("accentColor", color);
+    localStorage.setItem("accentColorName", name);
+
+    // Обновляем CSS переменную
+    document.documentElement.style.setProperty("--accent-color", color);
+
+    // Обновляем UI
+    this.updateAccentColorUI(color, name);
+
+    // Применяем цвет ко всем элементам
+    this.applyAccentColorToElements(color);
+
+    console.log(`🎨 Акцентный цвет изменен на: ${name} (${color})`);
+  }
+
+  updateAccentColorUI(color, name) {
+    if (this.accentColorPreview) {
+      this.accentColorPreview.style.background = color;
+    }
+    if (this.accentColorHex) {
+      this.accentColorHex.textContent = color;
+    }
+    if (this.accentColorName) {
+      this.accentColorName.textContent = name;
+    }
+
+    // Обновляем активный пресет
+    document.querySelectorAll(".accent-preset").forEach((preset) => {
+      if (preset.dataset.color === color) {
+        preset.classList.add("active", "preset-pulse");
+      } else {
+        preset.classList.remove("active", "preset-pulse");
+      }
+    });
+  }
+
+  applyAccentColorToElements(color) {
+    // Обновляем все элементы с акцентным цветом
+    const accentElements = document.querySelectorAll(
+      '[style*="--accent-color"], .tab-btn.active, .switch input:checked + .slider',
+    );
+
+    // Добавляем плавный переход
+    document.documentElement.classList.add("smooth-color-transition");
+
+    setTimeout(() => {
+      document.documentElement.classList.remove("smooth-color-transition");
+    }, 500);
+  }
+
+  showAccentColorChangeAnimation() {
+    if (this.accentColorPreview) {
+      this.accentColorPreview.classList.add("accent-glow");
+      setTimeout(() => {
+        this.accentColorPreview.classList.remove("accent-glow");
+      }, 1500);
+    }
+
+    // Показываем уведомление
+    this.showNotification(`Акцентный цвет изменен! 🎨`, "success");
+  }
+
+  loadAccentColor() {
+    const savedColor = localStorage.getItem("accentColor") || "#6750a4";
+    const savedName = localStorage.getItem("accentColorName") || "Фиолетовый";
+
+    this.applyAccentColor(savedColor, savedName);
+  }
+
+  getCurrentAccentColor() {
+    return localStorage.getItem("accentColor") || "#6750a4";
+  }
+
+  // ИСПРАВЛЕННЫЙ МЕТОД: Открытие color picker
+  openColorPicker(type, currentColor, index = null) {
+    // Закрываем предыдущий color picker если он открыт
+    if (this.colorPickerOverlay) {
+      this.closeColorPicker();
+      return;
+    }
+
+    this.createColorPickerDialog(type, currentColor, index);
+  }
+
+  createColorPickerDialog(type, currentColor, index = null) {
+    // Создаем overlay
+    this.colorPickerOverlay = document.createElement("div");
+    this.colorPickerOverlay.className = "color-picker-overlay";
+
+    // Создаем диалог
+    const dialog = document.createElement("div");
+    dialog.className = "color-picker-dialog color-picker-open";
+
+    const title = this.getColorPickerTitle(type, index);
+
+    dialog.innerHTML = `
+            <h3>${title}</h3>
+            <input type="color" id="nativeColorPicker" value="${currentColor}"
+                   style="width: 100%; height: 150px; border: none; border-radius: 8px; cursor: pointer;">
+            <div class="color-picker-actions">
+                <button class="color-picker-cancel" id="colorPickerCancel">Отмена</button>
+                <button class="color-picker-confirm" id="colorPickerConfirm">Выбрать</button>
+            </div>
+        `;
+
+    this.colorPickerOverlay.appendChild(dialog);
+    document.body.appendChild(this.colorPickerOverlay);
+
+    // Сохраняем контекст для использования в обработчиках
+    this.pendingColorChange = { type, index, currentColor };
+
+    // Обработчики событий
+    const nativePicker = dialog.querySelector("#nativeColorPicker");
+    const confirmBtn = dialog.querySelector("#colorPickerConfirm");
+    const cancelBtn = dialog.querySelector("#colorPickerCancel");
+
+    // Анимация при изменении цвета
+    nativePicker.addEventListener("input", (e) => {
+      this.animateColorChange(nativePicker);
+    });
+
+    confirmBtn.addEventListener("click", () => {
+      this.confirmColorSelection(nativePicker.value);
+    });
+
+    cancelBtn.addEventListener("click", () => {
+      this.closeColorPicker();
+    });
+
+    this.colorPickerOverlay.addEventListener("click", (e) => {
+      if (e.target === this.colorPickerOverlay) {
+        this.closeColorPicker();
+      }
+    });
+
+    // Закрытие по ESC
+    const escHandler = (e) => {
+      if (e.key === "Escape") {
+        this.closeColorPicker();
+        document.removeEventListener("keydown", escHandler);
+      }
+    };
+    document.addEventListener("keydown", escHandler);
+
+    // Сохраняем ссылку для удаления
+    this.currentEscHandler = escHandler;
+
+    // Фокус на color picker
+    setTimeout(() => {
+      nativePicker.focus();
+    }, 100);
+  }
+
+  getColorPickerTitle(type, index) {
+    switch (type) {
+      case "accent":
+        return "Выберите акцентный цвет";
+      case "solid":
+        return "Выберите цвет фона";
+      case "gradient":
+        return `Выберите цвет градиента ${index + 1}`;
+      default:
+        return "Выберите цвет";
+    }
+  }
+
+  animateColorChange(colorPicker) {
+    // Создаем ripple эффект
+    this.createRippleEffect(colorPicker);
+
+    // Добавляем класс анимации
+    colorPicker.classList.add("color-hover");
+    setTimeout(() => {
+      colorPicker.classList.remove("color-hover");
+    }, 300);
+  }
+
+  createRippleEffect(element) {
+    const rect = element.getBoundingClientRect();
+    const ripple = document.createElement("div");
+    ripple.className = "color-ripple";
+    ripple.style.width = "20px";
+    ripple.style.height = "20px";
+    ripple.style.left = rect.width / 2 - 10 + "px";
+    ripple.style.top = rect.height / 2 - 10 + "px";
+
+    element.appendChild(ripple);
+
+    setTimeout(() => {
+      if (ripple.parentNode) {
+        ripple.parentNode.removeChild(ripple);
+      }
+    }, 600);
+  }
+
+  confirmColorSelection(color) {
+    if (!this.pendingColorChange) return;
+
+    const { type, index } = this.pendingColorChange;
+
+    // Анимация подтверждения
+    this.animateColorConfirmation();
+
+    switch (type) {
+      case "accent":
+        this.applyAccentColor(color, "Пользовательский");
+        break;
+      case "solid":
+        this.changeSolidColor(color);
+        break;
+      case "gradient":
+        this.changeGradientColor(index, color);
+        break;
+    }
+
+    this.closeColorPicker();
+  }
+
+  animateColorConfirmation() {
+    const confirmBtn = document.querySelector("#colorPickerConfirm");
+    if (confirmBtn) {
+      confirmBtn.classList.add("color-select-animation");
+      setTimeout(() => {
+        confirmBtn.classList.remove("color-select-animation");
+      }, 600);
+    }
+  }
+
+  closeColorPicker() {
+    if (this.colorPickerOverlay) {
+      const dialog = this.colorPickerOverlay.querySelector(
+        ".color-picker-dialog",
+      );
+      if (dialog) {
+        dialog.classList.remove("color-picker-open");
+        dialog.classList.add("color-picker-close");
+      }
+
+      setTimeout(() => {
+        if (this.colorPickerOverlay && this.colorPickerOverlay.parentNode) {
+          this.colorPickerOverlay.parentNode.removeChild(
+            this.colorPickerOverlay,
+          );
+        }
+        this.colorPickerOverlay = null;
+
+        if (this.currentEscHandler) {
+          document.removeEventListener("keydown", this.currentEscHandler);
+          this.currentEscHandler = null;
+        }
+        this.pendingColorChange = null;
+      }, 300);
+    }
   }
 
   initializeSoundSystem() {
@@ -59,13 +448,13 @@ class SettingsManager {
     if (document.getElementById("soundSelection")) return;
 
     const soundSelectionHTML = `
-      <div class="sound-selection" id="soundSelection">
-        <div class="sound-combobox">
-          <select class="sound-select" id="soundSelect">
-          </select>
-        </div>
-      </div>
-    `;
+            <div class="sound-selection" id="soundSelection">
+                <div class="sound-combobox">
+                    <select class="sound-select" id="soundSelect">
+                    </select>
+                </div>
+            </div>
+        `;
 
     // Добавляем после переключателя звуков
     const soundToggle = audioCategory.querySelector("#soundToggle");
@@ -130,10 +519,9 @@ class SettingsManager {
         soundSelect.classList.remove("sound-selected");
       }, 300);
 
-      this.showNotification(
-        `Звук изменен на: ${this.getSoundName(soundId)}`,
-        "success",
-      );
+      // Получаем человеко-читаемое название звука
+      const soundName = this.getSoundDisplayName(soundId);
+      this.showNotification(`Звук изменен на: ${soundName}`, "success");
     } else {
       this.showNotification("Ошибка смены звука", "error");
       // Сбрасываем выбор в комбобоксе
@@ -141,12 +529,13 @@ class SettingsManager {
     }
   }
 
-  getSoundName(soundId) {
-    if (typeof clickSounds !== "undefined" && clickSounds) {
-      const sound = clickSounds.sounds.find((s) => s.id === soundId);
-      return sound ? sound.name : soundId;
+  getSoundDisplayName(soundId) {
+    if (typeof clickSounds === "undefined" || !clickSounds) {
+      return soundId; // fallback на ID если звуки не загружены
     }
-    return soundId;
+
+    const sound = clickSounds.sounds.find((s) => s.id === soundId);
+    return sound ? sound.name : soundId;
   }
 
   setupEventListeners() {
@@ -193,6 +582,242 @@ class SettingsManager {
     if (this.soundToggle) {
       this.soundToggle.addEventListener("change", () => this.toggleSound());
     }
+  }
+
+  // ИСПРАВЛЕННЫЙ МЕТОД: Настройка обработчиков для фона
+  setupBackgroundSettings() {
+    if (this.backgroundTypeSelect) {
+      this.backgroundTypeSelect.addEventListener("change", (e) => {
+        this.changeBackgroundType(e.target.value);
+      });
+    }
+
+    // Обработчики для кликов на превью цветов
+    if (this.colorPreview) {
+      this.colorPreview.addEventListener("click", () => {
+        const currentColor = this.solidColorInput?.value || "#6750a4";
+        this.openColorPicker("solid", currentColor);
+      });
+    }
+
+    // Обработчики для кастомных цветов градиента
+    this.gradientColorPreviews.forEach((preview, index) => {
+      if (preview) {
+        preview.addEventListener("click", () => {
+          const currentColor =
+            this.gradientColorInputs[index]?.value || "#6750a4";
+          this.openColorPicker("gradient", currentColor, index);
+        });
+      }
+    });
+
+    // Скрываем текстовые поля - они теперь только для хранения значений
+    this.gradientColorInputs.forEach((input) => {
+      if (input) {
+        input.style.display = "none";
+      }
+    });
+    if (this.solidColorInput) {
+      this.solidColorInput.style.display = "none";
+    }
+  }
+
+  changeBackgroundType(type) {
+    localStorage.setItem("backgroundType", type);
+    this.applyBackgroundSettings();
+
+    // Показываем/скрываем соответствующие элементы
+    this.toggleBackgroundSettingsVisibility(type);
+
+    // Анимация переключения
+    const containers = document.querySelectorAll(
+      ".color-picker-container, .custom-gradient-container",
+    );
+    containers.forEach((container) => {
+      if (container.style.display !== "none") {
+        container.classList.add("background-type-switch");
+        setTimeout(() => {
+          container.classList.remove("background-type-switch");
+        }, 300);
+      }
+    });
+  }
+
+  toggleBackgroundSettingsVisibility(type) {
+    const colorPicker = document.querySelector(".color-picker-container");
+    const customGradient = document.querySelector(".custom-gradient-container");
+
+    if (colorPicker) {
+      colorPicker.style.display = type === "solid" ? "block" : "none";
+    }
+
+    if (customGradient) {
+      customGradient.style.display =
+        type === "custom-gradient" ? "block" : "none";
+    }
+  }
+
+  changeSolidColor(color) {
+    if (!this.validateHexColor(color)) {
+      return;
+    }
+
+    localStorage.setItem("solidBackgroundColor", color);
+    this.applyBackgroundSettings();
+
+    // Обновляем превью цвета
+    if (this.colorPreview) {
+      this.colorPreview.style.background = color;
+    }
+    if (this.solidColorInput) {
+      this.solidColorInput.value = color;
+    }
+  }
+
+  changeGradientColor(index, color) {
+    if (!this.validateHexColor(color)) {
+      return;
+    }
+
+    // Сохраняем цвет в массив
+    const gradientColors = JSON.parse(
+      localStorage.getItem("customGradientColors") ||
+        '["#6750a4", "#b583da", "#e67bd6", "#ff8da1"]',
+    );
+    gradientColors[index] = color;
+    localStorage.setItem(
+      "customGradientColors",
+      JSON.stringify(gradientColors),
+    );
+
+    // Обновляем превью цвета
+    if (this.gradientColorPreviews[index]) {
+      this.gradientColorPreviews[index].style.background = color;
+    }
+    if (this.gradientColorInputs[index]) {
+      this.gradientColorInputs[index].value = color;
+    }
+
+    // Обновляем общий превью градиента
+    this.updateGradientPreview();
+
+    // Применяем настройки если выбран кастомный градиент
+    if (localStorage.getItem("backgroundType") === "custom-gradient") {
+      this.applyBackgroundSettings();
+    }
+  }
+
+  updateGradientPreview() {
+    if (!this.gradientPreview) return;
+
+    const gradientColors = JSON.parse(
+      localStorage.getItem("customGradientColors") ||
+        '["#6750a4", "#b583da", "#e67bd6", "#ff8da1"]',
+    );
+    const gradientString = `linear-gradient(45deg, ${gradientColors.join(", ")})`;
+    this.gradientPreview.style.background = gradientString;
+  }
+
+  validateHexColor(color) {
+    return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
+  }
+
+  applyBackgroundSettings() {
+    const backgroundType = localStorage.getItem("backgroundType") || "gradient";
+
+    switch (backgroundType) {
+      case "solid":
+        this.applySolidBackground();
+        break;
+      case "custom-gradient":
+        this.applyCustomGradientBackground();
+        break;
+      case "gradient":
+      default:
+        this.applyDefaultGradientBackground();
+        break;
+    }
+  }
+
+  applySolidBackground() {
+    const solidColor =
+      localStorage.getItem("solidBackgroundColor") || "#6750a4";
+    document.body.style.background = solidColor;
+    document.body.style.backgroundSize = "auto";
+    document.body.style.animation = "none";
+  }
+
+  applyCustomGradientBackground() {
+    const gradientColors = JSON.parse(
+      localStorage.getItem("customGradientColors") ||
+        '["#6750a4", "#b583da", "#e67bd6", "#ff8da1"]',
+    );
+    const gradientString = `linear-gradient(-45deg, ${gradientColors.join(", ")})`;
+
+    document.body.style.background = gradientString;
+    document.body.style.backgroundSize = "400% 400%";
+    document.body.style.animation = "gradient 20s ease infinite";
+  }
+
+  applyDefaultGradientBackground() {
+    document.body.style.background = `
+            linear-gradient(
+                -45deg,
+                #6750a4,
+                #b583da,
+                #e67bd6,
+                #ff8da1,
+                #006a6b,
+                #00b3a6,
+                #8e24aa,
+                #ba68c8
+            )
+        `;
+    document.body.style.backgroundSize = "400% 400%";
+    document.body.style.animation = "gradient 20s ease infinite";
+  }
+
+  loadBackgroundSettings() {
+    // Загружаем настройки фона
+    const backgroundType = localStorage.getItem("backgroundType") || "gradient";
+    const solidColor =
+      localStorage.getItem("solidBackgroundColor") || "#6750a4";
+    const gradientColors = JSON.parse(
+      localStorage.getItem("customGradientColors") ||
+        '["#6750a4", "#b583da", "#e67bd6", "#ff8da1"]',
+    );
+
+    // Устанавливаем значения в UI
+    if (this.backgroundTypeSelect) {
+      this.backgroundTypeSelect.value = backgroundType;
+    }
+
+    if (this.solidColorInput) {
+      this.solidColorInput.value = solidColor;
+    }
+
+    if (this.colorPreview) {
+      this.colorPreview.style.background = solidColor;
+    }
+
+    // Устанавливаем цвета градиента
+    gradientColors.forEach((color, index) => {
+      if (this.gradientColorInputs[index]) {
+        this.gradientColorInputs[index].value = color;
+      }
+      if (this.gradientColorPreviews[index]) {
+        this.gradientColorPreviews[index].style.background = color;
+      }
+    });
+
+    // Обновляем превью градиента
+    this.updateGradientPreview();
+
+    // Показываем/скрываем соответствующие элементы
+    this.toggleBackgroundSettingsVisibility(backgroundType);
+
+    // Применяем настройки
+    this.applyBackgroundSettings();
   }
 
   setupModsEventListeners() {
@@ -370,6 +995,18 @@ class SettingsManager {
         clicker.resetData();
       }
       localStorage.removeItem("clickCount");
+
+      // Сбрасываем настройки фона
+      localStorage.removeItem("backgroundType");
+      localStorage.removeItem("solidBackgroundColor");
+      localStorage.removeItem("customGradientColors");
+      this.loadBackgroundSettings();
+
+      // Сбрасываем акцентный цвет
+      localStorage.removeItem("accentColor");
+      localStorage.removeItem("accentColorName");
+      this.loadAccentColor();
+
       this.resetDataBtn.classList.add("animate-shake");
       setTimeout(() => {
         this.resetDataBtn.classList.remove("animate-shake");
@@ -811,16 +1448,16 @@ class SettingsManager {
       notification = document.createElement("div");
       notification.className = `sound-notification ${type}`;
       notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${type === "success" ? "#4CAF50" : type === "error" ? "#F44336" : "#2196F3"};
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
-        z-index: 1001;
-        animation: slideInRight 0.3s ease-out;
-      `;
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === "success" ? "#4CAF50" : type === "error" ? "#F44336" : "#2196F3"};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                z-index: 1001;
+                animation: slideInRight 0.3s ease-out;
+            `;
       document.body.appendChild(notification);
     }
 

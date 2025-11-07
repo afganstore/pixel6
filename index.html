@@ -158,6 +158,220 @@
                                 </label>
                                 <span class="setting-label">Тёмная тема</span>
                             </div>
+
+                            <!-- Выбор типа фона -->
+                            <div class="background-selection">
+                                <div class="background-type-selector">
+                                    <div class="background-combobox">
+                                        <select
+                                            class="background-select"
+                                            id="backgroundTypeSelect"
+                                        >
+                                            <option value="gradient">
+                                                Градиент всех цветов
+                                            </option>
+                                            <option value="custom-gradient">
+                                                Свой градиент
+                                            </option>
+                                            <option value="solid">
+                                                Сплошной цвет
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Color Picker для сплошного цвета -->
+                                <div
+                                    class="color-picker-container"
+                                    style="display: none"
+                                >
+                                    <label class="color-picker-label"
+                                        >Выберите цвет фона:</label
+                                    >
+                                    <div class="color-picker-wrapper">
+                                        <input
+                                            type="text"
+                                            class="color-picker-input"
+                                            id="solidColorInput"
+                                            value="#6750a4"
+                                            style="display: none"
+                                        />
+                                        <div
+                                            class="color-preview"
+                                            id="colorPreview"
+                                            title="Нажмите для выбора цвета"
+                                            style="background: #6750a4"
+                                        >
+                                            <input
+                                                type="text"
+                                                class="color-preview-input"
+                                                id="colorPreviewInput"
+                                                value="#6750a4"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="
+                                            font-size: 0.8rem;
+                                            color: var(--text-secondary);
+                                            margin-top: 0.5rem;
+                                        "
+                                    >
+                                        Нажмите на цвет для выбора
+                                    </div>
+                                </div>
+
+                                <!-- Кастомные цвета градиента -->
+                                <div
+                                    class="custom-gradient-container"
+                                    style="display: none"
+                                >
+                                    <label class="color-picker-label"
+                                        >Выберите цвета градиента (нажмите на
+                                        цвет):</label
+                                    >
+                                    <div class="gradient-colors-grid">
+                                        <div class="gradient-color-item">
+                                            <div
+                                                class="gradient-color-preview"
+                                                id="gradientColorPreview1"
+                                                title="Нажмите для выбора цвета"
+                                                style="background: #6750a4"
+                                            >
+                                                <input
+                                                    type="text"
+                                                    class="gradient-color-input"
+                                                    id="gradientColor1"
+                                                    value="#6750a4"
+                                                />
+                                            </div>
+                                            <span class="gradient-color-label"
+                                                >Цвет 1</span
+                                            >
+                                        </div>
+                                        <div class="gradient-color-item">
+                                            <div
+                                                class="gradient-color-preview"
+                                                id="gradientColorPreview2"
+                                                title="Нажмите для выбора цвета"
+                                                style="background: #b583da"
+                                            >
+                                                <input
+                                                    type="text"
+                                                    class="gradient-color-input"
+                                                    id="gradientColor2"
+                                                    value="#b583da"
+                                                />
+                                            </div>
+                                            <span class="gradient-color-label"
+                                                >Цвет 2</span
+                                            >
+                                        </div>
+                                        <div class="gradient-color-item">
+                                            <div
+                                                class="gradient-color-preview"
+                                                id="gradientColorPreview3"
+                                                title="Нажмите для выбора цвета"
+                                                style="background: #e67bd6"
+                                            >
+                                                <input
+                                                    type="text"
+                                                    class="gradient-color-input"
+                                                    id="gradientColor3"
+                                                    value="#e67bd6"
+                                                />
+                                            </div>
+                                            <span class="gradient-color-label"
+                                                >Цвет 3</span
+                                            >
+                                        </div>
+                                        <div class="gradient-color-item">
+                                            <div
+                                                class="gradient-color-preview"
+                                                id="gradientColorPreview4"
+                                                title="Нажмите для выбора цвета"
+                                                style="background: #ff8da1"
+                                            >
+                                                <input
+                                                    type="text"
+                                                    class="gradient-color-input"
+                                                    id="gradientColor4"
+                                                    value="#ff8da1"
+                                                />
+                                            </div>
+                                            <span class="gradient-color-label"
+                                                >Цвет 4</span
+                                            >
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="gradient-preview"
+                                        id="gradientPreview"
+                                    ></div>
+                                    <div
+                                        style="
+                                            font-size: 0.8rem;
+                                            color: var(--text-secondary);
+                                            margin-top: 0.5rem;
+                                        "
+                                    >
+                                        Превью вашего градиента
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Блок выбора акцентного цвета -->
+                            <div class="accent-color-selection">
+                                <label class="accent-color-label"
+                                    >🎨 Акцентный цвет</label
+                                >
+                                <div class="accent-color-description">
+                                    Выберите основной цвет интерфейса. Влияет на
+                                    кнопки, переключатели и выделенные элементы.
+                                </div>
+
+                                <div class="accent-color-preview-container">
+                                    <div
+                                        class="accent-color-preview"
+                                        id="accentColorPreview"
+                                        title="Нажмите для выбора цвета"
+                                    >
+                                        <input
+                                            type="text"
+                                            class="accent-color-preview-input"
+                                            id="accentColorPreviewInput"
+                                        />
+                                    </div>
+                                    <div class="accent-color-info">
+                                        <div
+                                            class="accent-color-hex"
+                                            id="accentColorHex"
+                                        >
+                                            #6750a4
+                                        </div>
+                                        <div
+                                            class="accent-color-name"
+                                            id="accentColorName"
+                                        >
+                                            Фиолетовый
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="accent-color-presets">
+                                    <div class="accent-presets-title">
+                                        Быстрый выбор:
+                                    </div>
+                                    <div
+                                        class="accent-presets-grid"
+                                        id="accentPresets"
+                                    >
+                                        <!-- Пресеты будут добавлены через JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- УБРАН ПЕРЕКЛЮЧАТЕЛЬ КОМПАКТНОГО РЕЖИМА -->
                         </div>
                     </div>
 
@@ -175,6 +389,24 @@
                                     <span class="slider"></span>
                                 </label>
                                 <span class="setting-label">Звуки кликов</span>
+                            </div>
+
+                            <!-- Выбор звука клика -->
+                            <div class="sound-selection" id="soundSelection">
+                                <div class="sound-combobox">
+                                    <select
+                                        class="sound-select"
+                                        id="soundSelect"
+                                    >
+                                        <option value="pixel6">
+                                            У меня Пиксиль 6
+                                        </option>
+                                        <option value="iph11">
+                                            У меня Мылофон 11
+                                        </option>
+                                        <option value="esha">Ешьа</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>

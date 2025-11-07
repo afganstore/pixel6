@@ -235,15 +235,21 @@ class PixelClicker {
   }
 
   startContinuousGradient() {
-    let position = 0;
+    const backgroundType = localStorage.getItem("backgroundType") || "gradient";
 
-    const animateGradient = () => {
-      position = (position + 0.1) % 100;
-      document.body.style.backgroundPosition = `${position}% ${position}%`;
-      requestAnimationFrame(animateGradient);
-    };
+    // Анимация градиента нужна только для градиентных фонов
+    if (backgroundType === "gradient" || backgroundType === "custom-gradient") {
+      let position = 0;
 
-    animateGradient();
+      const animateGradient = () => {
+        position = (position + 0.1) % 100;
+        document.body.style.backgroundPosition = `${position}% ${position}%`;
+        requestAnimationFrame(animateGradient);
+      };
+
+      animateGradient();
+    }
+    // Для сплошного цвета анимация не нужна
   }
 
   loadSkinSetting() {

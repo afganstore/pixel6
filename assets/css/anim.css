@@ -527,3 +527,217 @@
 .no-animations .skin-particle {
     display: none !important;
 }
+
+/* НОВЫЕ АНИМАЦИИ ДЛЯ COLOR PICKER */
+
+/* Анимация открытия color picker */
+@keyframes colorPickerOpen {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.7) rotate(-5deg);
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.05) rotate(2deg);
+    }
+    80% {
+        transform: translate(-50%, -50%) scale(0.98) rotate(-1deg);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    }
+}
+
+/* Анимация закрытия color picker */
+@keyframes colorPickerClose {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.05) rotate(3deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.7) rotate(-5deg);
+    }
+}
+
+/* Анимация выбора цвета */
+@keyframes colorSelect {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(103, 80, 164, 0.4);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 10px rgba(103, 80, 164, 0.2);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(103, 80, 164, 0);
+    }
+}
+
+/* Анимация пульсации для активного пресета */
+@keyframes presetPulse {
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    50% {
+        transform: scale(1.08);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+}
+
+/* Анимация смены акцентного цвета */
+@keyframes accentColorGlow {
+    0% {
+        box-shadow: 0 0 5px currentColor;
+    }
+    50% {
+        box-shadow:
+            0 0 20px currentColor,
+            0 0 30px currentColor;
+    }
+    100% {
+        box-shadow: 0 0 5px currentColor;
+    }
+}
+
+/* Анимация появления пресетов */
+@keyframes presetStagger {
+    0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Анимация hover для цветных элементов */
+@keyframes colorHover {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* Классы для новых анимаций */
+.color-picker-open {
+    animation: colorPickerOpen 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.color-picker-close {
+    animation: colorPickerClose 0.3s ease-out forwards;
+}
+
+.color-select-animation {
+    animation: colorSelect 0.6s ease-out;
+}
+
+.preset-pulse {
+    animation: presetPulse 2s ease-in-out infinite;
+}
+
+.accent-glow {
+    animation: accentColorGlow 1.5s ease-in-out;
+}
+
+.preset-stagger {
+    animation: presetStagger 0.4s ease-out forwards;
+}
+
+.color-hover {
+    animation: colorHover 0.3s ease-out;
+}
+
+/* Задержки для пресетов */
+.preset-delay-1 {
+    animation-delay: 0.1s;
+}
+.preset-delay-2 {
+    animation-delay: 0.2s;
+}
+.preset-delay-3 {
+    animation-delay: 0.3s;
+}
+.preset-delay-4 {
+    animation-delay: 0.4s;
+}
+.preset-delay-5 {
+    animation-delay: 0.5s;
+}
+.preset-delay-6 {
+    animation-delay: 0.6s;
+}
+.preset-delay-7 {
+    animation-delay: 0.7s;
+}
+.preset-delay-8 {
+    animation-delay: 0.8s;
+}
+
+/* Анимация ripple эффекта для кликов по цветам */
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+.color-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+}
+
+/* Анимация плавного изменения цвета */
+@keyframes smoothColorChange {
+    0% {
+        filter: hue-rotate(0deg) saturate(1);
+    }
+    100% {
+        filter: hue-rotate(360deg) saturate(1.2);
+    }
+}
+
+.smooth-color-transition {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Анимация для индикатора выбора цвета */
+@keyframes colorIndicator {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2) rotate(180deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(360deg);
+        opacity: 1;
+    }
+}
+
+.color-indicator {
+    animation: colorIndicator 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
